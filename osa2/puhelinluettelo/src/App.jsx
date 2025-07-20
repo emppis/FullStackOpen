@@ -3,6 +3,8 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import personService from './services/persons'
+import Notification from './components/Notification'
+import './index.css'
 
 
 const App = () => {
@@ -10,6 +12,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] =useState('')
+  const [notification, setNotification] = useState({ message: null, type: null })
+
 
   useEffect(() => {
     personService
@@ -39,10 +43,16 @@ const App = () => {
           setPersons(persons.map(p => p.id !== existingPerson.id ? p : response.data))
           setNewName('')
           setNewNumber('')
+          setNotification({ message: `Updated ${response.data.name}'s number`, type: 'success' })
+          setTimeout(() => setNotification({ message: null, type: null }), 5000)
         })
         .catch(error => {
-          alert(`Failed to update ${newName}. The person may have been removed from the server`)
-        })
+          setNotification({ message: `Information of ${newName} has already been removed from server`, type: 'error' })
+          setTimeout(() => setNotification({ message: null, type: null }), 5000)
+          setPersons(persons.filter(p => p.id !== existingPerson.id)) // siivotaan lista silti
+          setNewName('')
+          setNewNumber('')
+  })
       }
     return
   }
@@ -60,6 +70,10 @@ const App = () => {
         setPersons(persons.concat(response.data))
         setNewName('')
         setNewNumber('')
+        setNotification({ message: `Added ${response.data.name}`, type: 'success' })
+        setTimeout(() => {
+          setNotification({ message: null, type: null })
+        }, 5000)
       })
 
 
@@ -83,7 +97,15 @@ const App = () => {
       .remove(id)
       .then(() => {
         setPersons(persons.filter(person => person.id !== id))
+        setNotification({ message: `Deleted ${name}`, type: 'success' })
+        setTimeout(() => {
+          setNotification({ message: null, type: null })
+        }, 5000)
       })
+      .catch(error => {
+        setNotification({ message: `Failed to delete ${name}`, type: 'error' })
+      setTimeout(() => setNotification({ message: null, type: null }), 5000)
+})
     }
   }
 
@@ -94,6 +116,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification.message} type={notification.type} />
       <Filter value={filter} onChange={handleFilterChange}/>
       <h2>Add a new </h2>
       <PersonForm 

@@ -6,11 +6,6 @@
       "id": "1"
     },
     {
-      "name": "Ada Lovelace",
-      "number": "39-44-5323523",
-      "id": "2"
-    },
-    {
       "name": "Dan Abramov",
       "number": "12-43-234345",
       "id": "3"
@@ -23,27 +18,22 @@
     {
       "id": "a9c9",
       "name": "jee jee",
-      "number": "4133"
-    },
-    {
-      "id": "c3e9",
-      "name": "hsafdk jlds",
-      "number": "452463"
-    },
-    {
-      "id": "700e",
-      "name": "misacorp",
-      "number": "561264"
-    },
-    {
-      "id": "4022",
-      "name": "jee",
-      "number": "1234"
+      "number": "55555"
     },
     {
       "id": "86b9",
       "name": "Misacorp",
       "number": "56978"
+    },
+    {
+      "id": "b0bf",
+      "name": "nina weiler",
+      "number": "5654364"
+    },
+    {
+      "id": "8cd1",
+      "name": "jjoij",
+      "number": "456456"
     }
   ]
 }
