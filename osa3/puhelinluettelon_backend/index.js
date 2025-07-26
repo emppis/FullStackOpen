@@ -1,7 +1,9 @@
 const express = require('express')
+const cors = require('cors')
 const morgan = require('morgan')
 const app = express()
 
+app.use(cors())
 app.use(express.json())
 morgan.token('body', (req) => JSON.stringify(req.body))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
@@ -55,6 +57,26 @@ app.delete('/api/persons/:id', (request, response) => {
   response.status(204).end()
 })
 
+app.put('/api/persons/:id', (request, response) => {
+  const id = request.params.id
+  const body = request.body
+
+  const personIndex = persons.findIndex(p => p.id === id)
+
+  if (personIndex === -1) {
+    return response.status(404).json({ error: 'person not found' })
+  }
+
+  const updatedPerson = {
+    ...persons[personIndex],
+    name: body.name,
+    number: body.number
+  }
+
+  persons[personIndex] = updatedPerson
+  response.json(updatedPerson)
+})
+
 const generateId = () => {
   let id
   do {
@@ -65,6 +87,8 @@ const generateId = () => {
 
 app.post('/api/persons', (request, response) => {
   const body = request.body
+
+  console.log(request.body)
 
   if (!body.name || !body.number) {
     console.error('Error: name or number missing')
@@ -99,7 +123,7 @@ app.get('/info', (request, response) => {
   `)
 })
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
