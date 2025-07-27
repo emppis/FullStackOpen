@@ -29,33 +29,35 @@ const App = () => {
     const existingPerson = persons.find(p => p.name === newName)
 
     if (existingPerson) {
-      const confirmUpdate = window.confirm(
-        `${newName} is already added to phonebook, replace the old number with a new one?`
-      )
-  
+  const confirmUpdate = window.confirm(
+    `${newName} is already added to phonebook, replace the old number with a new one?`
+  )
 
-    if (confirmUpdate) {
-      const updatedPerson = { ...existingPerson, number: newNumber }
-      
-      personService
-        .update(existingPerson.id, updatedPerson)
-        .then(response => {
-          setPersons(persons.map(p => p.id !== existingPerson.id ? p : response.data))
-          setNewName('')
-          setNewNumber('')
-          setNotification({ message: `Updated ${response.data.name}'s number`, type: 'success' })
-          setTimeout(() => setNotification({ message: null, type: null }), 5000)
-        })
-        .catch(error => {
-          setNotification({ message: `Information of ${newName} has already been removed from server`, type: 'error' })
-          setTimeout(() => setNotification({ message: null, type: null }), 5000)
-          setPersons(persons.filter(p => p.id !== existingPerson.id)) // siivotaan lista silti
-          setNewName('')
-          setNewNumber('')
-  })
-      }
-    return
+  if (confirmUpdate) {
+    const updatedPerson = { ...existingPerson, number: newNumber }
+
+    personService
+      .update(existingPerson.id, updatedPerson)
+      .then(response => {
+        setPersons(persons.map(p => p.id !== existingPerson.id ? p : response.data))
+        setNewName('')
+        setNewNumber('')
+        setNotification({ message: `Updated ${response.data.name}'s number`, type: 'success' })
+        setTimeout(() => setNotification({ message: null, type: null }), 5000)
+      })
+      .catch(error => {
+        setNotification({ message: `Information of ${newName} has already been removed from server`, type: 'error' })
+        setTimeout(() => setNotification({ message: null, type: null }), 5000)
+        setPersons(persons.filter(p => p.id !== existingPerson.id))
+        setNewName('')
+        setNewNumber('')
+      })
+
+    return 
+  } else {
+    return 
   }
+}
 
 
     const nameObject = {
