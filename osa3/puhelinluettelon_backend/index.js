@@ -47,8 +47,14 @@ app.delete('/api/persons/:id', (request, response, next) => {
 app.put('/api/persons/:id', (request, response, next) => {
   const { name, number } = request.body
 
+  const validPhone = /^\d{2,3}-\d{5,}$/
+    if (!validPhone.test(number)) {
+    return response.status(400).json({ error: 'Invalid phone number format' })
+  }
+
   Person.findByIdAndUpdate(
     request.params.id,
+    { name, number },
     { new: true, runValidators: true, context: 'query' }
   )
     .then(updatedPerson => {
@@ -60,24 +66,35 @@ app.put('/api/persons/:id', (request, response, next) => {
 
 
 app.post('/api/persons', (request, response, next) => {
-  const body = request.body
+  const { name, number } = request.body
 
-  if (!body.name || !body.number) {
-    console.error('Error: name or number missing')
-    return response.status(400).json({ error: 'name or number is missing'})
+  if (!name || !number) {
+    return response.status(400).json({ error: 'name or number is missing' })
   }
 
+  Person.findOne({ name }).then(existingPerson => {
+    if (existingPerson) {
+      const validPhone = /^\d{2,3}-\d{5,}$/
+      if (!validPhone.test(number)) {
+        return response.status(400).json({ error: 'Invalid phone number format' })
+      }
 
-  const person = new Person({
-    name: body.name,
-    number: body.number
+      existingPerson.number = number
+      existingPerson.save()
+        .then(updated => {
+          response.json(updated)
+        })
+        .catch(error => next(error))
+
+    } else {
+      const person = new Person({ name, number })
+      person.save()
+        .then(savedPerson => {
+          response.json(savedPerson)
+        })
+        .catch(error => next(error))
+    }
   })
-
-  person.save()
-    .then(savedPerson => {
-      response.json(savedPerson)
-    })
-    .catch(error => next(error))
 })
 
 
@@ -94,9 +111,7 @@ app.get('/info', (request, response) => {
 const errorHandler = (error, request, response, next) => {
   console.error(error.message)
 
-  if (error.name === 'CastError') {
-    return response.status(400).send({ error: 'malformatted id' })
-  } else if (error.name === 'ValidationError') {
+  if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message })
   }
 

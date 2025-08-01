@@ -46,12 +46,19 @@ const App = () => {
         setTimeout(() => setNotification({ message: null, type: null }), 5000)
       })
       .catch(error => {
-        setNotification({ message: `Information of ${newName} has already been removed from server`, type: 'error' })
+        const errorMessage = error.response?.data?.error
+
+        if (errorMessage) {
+          setNotification({ message: errorMessage, type: 'error' })
+        } else {
+          setNotification({ message: `Information of ${newName} has already been removed from server`, type: 'error' })
+          setPersons(persons.filter(p => p.id !== existingPerson.id))
+        }
+
         setTimeout(() => setNotification({ message: null, type: null }), 5000)
-        setPersons(persons.filter(p => p.id !== existingPerson.id))
         setNewName('')
         setNewNumber('')
-      })
+})
 
     return 
   } else {
@@ -77,6 +84,13 @@ const App = () => {
           setNotification({ message: null, type: null })
         }, 5000)
       })
+      .catch(error => {
+        const errorMessage = error.response?.data?.error || 'Failed to add person'
+        setNotification({ message: errorMessage, type: 'error' })
+        setTimeout(() => {
+          setNotification({ message: null, type: null })
+        }, 5000)
+        })
 
 
   }
