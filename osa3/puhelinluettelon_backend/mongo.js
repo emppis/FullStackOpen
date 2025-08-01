@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const args = process.argv
 
 if (args.length < 3) {
-    console.log('Anna salasana parametrina: node mongo.js <password> [name] [number]')
+  console.log('Anna salasana parametrina: node mongo.js <password> [name] [number]')
   process.exit(1)
 }
 
@@ -32,7 +32,7 @@ if (args.length === 5) {
     mongoose.connection.close()
   })
 
-  } else {
+} else {
   Person.find({}).then(result => {
     console.log('phonebook:')
     result.forEach(p => {

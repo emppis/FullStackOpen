@@ -48,7 +48,7 @@ app.put('/api/persons/:id', (request, response, next) => {
   const { name, number } = request.body
 
   const validPhone = /^\d{2,3}-\d{5,}$/
-    if (!validPhone.test(number)) {
+  if (!validPhone.test(number)) {
     return response.status(400).json({ error: 'Invalid phone number format' })
   }
 
@@ -100,8 +100,8 @@ app.post('/api/persons', (request, response, next) => {
 
 app.get('/info', (request, response) => {
   Person.countDocuments({}).then(count => {
-  const currentTime = new Date()
-  response.send(`
+    const currentTime = new Date()
+    response.send(`
     <p>Phonebook has info for ${count} people</p>
     <p>${currentTime}</p>
   `)
