@@ -2,8 +2,9 @@ POST http://localhost:3001/api/blogs
 Content-Type: application/json
 
 {
-  "title": "jee jee jee",
-  "author": "Emmiina Kivelä",
+  "title": "another blog",
+  "author": "another author",
   "url": "esimerkki.fi",
-  "likes": 42
+  "likes": 10,
+  "userId": "688f97f20583c80a311bbb3e"
 }
