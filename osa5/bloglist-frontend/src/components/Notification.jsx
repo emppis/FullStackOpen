@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types'
+
 const Notification = ({ message }) => {
   if (!message) return null
 
@@ -17,6 +19,13 @@ const Notification = ({ message }) => {
   }
 
   return <div style={style}>{message.message}</div>
+}
+
+Notification.propTypes = {
+  message: PropTypes.shape({
+    message: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired
+  })
 }
 
 export default Notification
