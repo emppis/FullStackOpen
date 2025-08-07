@@ -61,6 +61,10 @@ const App = () => {
     }
   }
 
+  const handleDeleteBlog = (id) => {
+  setBlogs(blogs.filter(blog => blog.id !== id))
+  }
+
   const loginForm = () => (
     <div>
       <h2>Log in to application</h2>
@@ -101,9 +105,12 @@ const App = () => {
         <BlogForm createBlog={handleCreateBlog} />
       </Togglable>
 
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
-      )}
+    {blogs
+      .slice()
+      .sort((a, b) => b.likes - a.likes) 
+      .map(blog =>
+      <Blog key={blog.id} blog={blog} user={user} onDelete={handleDeleteBlog}/>
+)}
     </div>
   )
 
