@@ -2,7 +2,7 @@ import { useState } from 'react'
 import blogService from '../services/blogs'
 import PropTypes from 'prop-types'
 
-const Blog = ({ blog, user, onDelete }) => {
+const Blog = ({ blog, user, onDelete, onLike }) => {
   const [visible, setVisible] = useState(false)
   const [likes, setLikes] = useState(blog.likes)
 
@@ -30,6 +30,9 @@ const Blog = ({ blog, user, onDelete }) => {
     try {
       const returnedBlog = await blogService.update(blog.id, updatedBlog)
       setLikes(returnedBlog.likes)
+      if (onLike) {
+        onLike(blog)
+      }
     } catch (error) {
       console.error('Error updating likes:', error)
     }
@@ -78,7 +81,8 @@ const Blog = ({ blog, user, onDelete }) => {
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
   user: PropTypes.object,
-  onDelete: PropTypes.func.isRequired
+  onDelete: PropTypes.func.isRequired,
+  onLike: PropTypes.func
 }
 
 
