@@ -1,10 +1,8 @@
 import { useState } from 'react'
-import blogService from '../services/blogs'
 import PropTypes from 'prop-types'
 
 const Blog = ({ blog, user, onDelete, onLike }) => {
   const [visible, setVisible] = useState(false)
-  const [likes, setLikes] = useState(blog.likes)
 
   const blogStyle = {
     paddingTop: 10,
@@ -18,33 +16,12 @@ const Blog = ({ blog, user, onDelete, onLike }) => {
     setVisible(!visible)
   }
 
-  const handleLike = async () => {
-    const updatedBlog = {
-      user: blog.user.id,
-      likes: likes + 1,
-      author: blog.author,
-      title: blog.title,
-      url: blog.url
-    }
-
-    try {
-      const returnedBlog = await blogService.update(blog.id, updatedBlog)
-      setLikes(returnedBlog.likes)
-      if (onLike) {
-        onLike(blog)
-      }
-    } catch (error) {
-      console.error('Error updating likes:', error)
-    }
-  }
-
   const handleDelete = async () => {
     const confirm = window.confirm(`Remove blog "${blog.title}" by ${blog.author}?`)
     if (!confirm) return
 
     try {
-      await blogService.remove(blog.id)
-      onDelete(blog.id)
+      await onDelete(blog.id)
     } catch (error) {
       console.error('Error deleting blog:', error)
     }
@@ -53,24 +30,24 @@ const Blog = ({ blog, user, onDelete, onLike }) => {
   const showDelete = user && blog.user && user.username === blog.user.username
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className="blog">
       {!visible ? (
         <div>
-          {blog.title} {blog.author}
+          <span data-testid="blog-title">{blog.title} {blog.author}</span>
           <button onClick={toggleVisibility}>view</button>
         </div>
       ) : (
         <div>
-          {blog.title} {blog.author}
+          <span data-testid="blog-title">{blog.title} {blog.author}</span>
           <button onClick={toggleVisibility}>hide</button>
-          <div>{blog.url}</div>
+          <div data-testid="blog-url">{blog.url}</div>
           <div>
-            likes {likes}
-            <button onClick={handleLike}>like</button>
+            <span data-testid="blog-likes">likes {blog.likes}</span>
+            <button onClick={() => onLike(blog.id)}>like</button>
           </div>
-          <div>{blog.user?.name}</div>
+          <div data-testid="blog-user">{blog.user?.name}</div>
           {showDelete && (
-            <button onClick={handleDelete}>delete</button>
+            <button onClick={handleDelete} data-testid="blog-remove">delete</button>
           )}
         </div>
       )}
@@ -82,8 +59,7 @@ Blog.propTypes = {
   blog: PropTypes.object.isRequired,
   user: PropTypes.object,
   onDelete: PropTypes.func.isRequired,
-  onLike: PropTypes.func
+  onLike: PropTypes.func.isRequired
 }
-
 
 export default Blog

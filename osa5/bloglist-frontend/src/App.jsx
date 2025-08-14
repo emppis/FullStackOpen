@@ -5,6 +5,7 @@ import loginService from './services/login'
 import Notification from './components/Notification'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
+import LoginForm from './components/LoginForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -65,32 +66,17 @@ const App = () => {
     setBlogs(blogs.filter(blog => blog.id !== id))
   }
 
-  const loginForm = () => (
-    <div>
-      <h2>Log in to application</h2>
-      <form onSubmit={handleLogin}>
-        <div>
-          username
-          <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </div>
-        <div>
-          password
-          <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <button type="submit">login</button>
-      </form>
-    </div>
-  )
+  const handleLikeBlog = async (id) => {
+    const blogToLike = blogs.find(b => b.id === id)
+    const updatedBlog = {
+      ...blogToLike,
+      likes: blogToLike.likes + 1,
+      user: blogToLike.user.id // varmista että backend hyväksyy tämän
+    }
+
+    const returnedBlog = await blogService.update(id, updatedBlog)
+    setBlogs(blogs.map(b => b.id !== id ? b : returnedBlog))
+  }
 
   const bloglist = () => (
     <div>
@@ -109,7 +95,13 @@ const App = () => {
         .slice()
         .sort((a, b) => b.likes - a.likes)
         .map(blog =>
-          <Blog key={blog.id} blog={blog} user={user} onDelete={handleDeleteBlog}/>
+          <Blog
+            key={blog.id}
+            blog={blog}
+            user={user}
+            onDelete={handleDeleteBlog}
+            onLike={handleLikeBlog}
+          />
         )}
     </div>
   )
@@ -117,7 +109,15 @@ const App = () => {
   return (
     <div>
       <Notification message={notification} />
-      {!user ? loginForm() : bloglist()}
+      {!user
+        ? <LoginForm
+          handleLogin={handleLogin}
+          username={username}
+          setUsername={setUsername}
+          password={password}
+          setPassword={setPassword}
+        />
+        : bloglist()}
     </div>
   )
 }
