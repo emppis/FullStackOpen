@@ -14,11 +14,10 @@ const Anecdote = ({ anecdote, handleClick }) => {
 const AnecdoteList = () => {
   const dispatch = useDispatch()
   const anecdotes = useSelector(({ anecdotes, filter }) =>
-  anecdotes
-    .filter(a => a.content.toLowerCase().includes(filter.toLowerCase()))
-    .sort((a, b) => b.votes - a.votes)
-)
-
+    anecdotes
+      .filter(a => a.content.toLowerCase().includes(filter.toLowerCase()))
+      .sort((a, b) => b.votes - a.votes)
+  )
   const handleVote = (anecdote) => {
     dispatch(voteAnecdote(anecdote.id))
     dispatch(showNotification(`You voted '${anecdote.content}'`, 5))
