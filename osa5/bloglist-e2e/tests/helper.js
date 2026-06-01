@@ -1,7 +1,9 @@
 const { expect } = require('@playwright/test')
 
 
-async function loginWith(page, username, password, name = null) {
+async function loginWith(page, username, password = null) {
+
+  await page.goto('/login')
 
   await expect(page.getByPlaceholder('Username')).toBeVisible({ timeout: 10000 })
 
@@ -9,26 +11,18 @@ async function loginWith(page, username, password, name = null) {
   await page.getByPlaceholder('Password').fill(password)
   await page.getByRole('button', { name: 'login' }).click()
 
-  if (name) {
-    await expect(page.getByText(`${name} logged in`)).toBeVisible({ timeout: 10000 })
-  } else {
-    await expect(page.getByRole('button', { name: 'logout' })).toBeVisible({ timeout: 10000 })
-  }
+  await expect(page.getByRole('heading', { name: 'Blogs' })).toBeVisible({ timeout: 10000 })
 }
 
-
-
-
 async function createBlog(request, token, blogData) {
-  await request.post('http://localhost:3001/api/blogs', {
+  const response = await request.post('/api/blogs', {
     headers: {
       Authorization: `Bearer ${token}`
     },
     data: blogData
   })
+
+  return await response.json()
 }
 
-module.exports = {
-  loginWith,
-  createBlog
-}
+module.exports = { loginWith, createBlog }

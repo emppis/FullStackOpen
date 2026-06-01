@@ -3,6 +3,10 @@ import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 import blogService from '../services/blogs'
 
+vi.mock('react-router-dom', () => ({
+  useParams: () => ({ id: 'abc123' })
+}))
+
 describe('<Blog />', () => {
   const blog = {
     title: 'Testi testi testi',
@@ -22,51 +26,76 @@ describe('<Blog />', () => {
     name: 'Emmiina Testaaja'
   }
 
-  test('renders title and author but not url or likes by default', () => {
-    render(<Blog blog={blog} user={user} onDelete={() => {}} />)
+  const otherUser = {
+    username: 'someoneelse',
+    name: 'Other User'
+  }
 
-    expect(screen.getByText(/Testi testi testi/)).toBeDefined()
-    expect(screen.getByText(/Matti Meikäläinen/)).toBeDefined()
+  test('unauthenticated user sees blog info and likes but no buttons', () => {
+    render(
+      <Blog
+        blogs={[blog]}
+        user={null}
+        onDelete={() => { }}
+        onLike={() => { }}
+      />
+    )
 
-    expect(screen.queryByText(/http:\/\/example.com\/testi/)).toBeNull()
-    expect(screen.queryByText(/likes 5/)).toBeNull()
+    expect(screen.getByText(/Testi testi testi/)).toBeInTheDocument()
+    expect(screen.getByText(/Matti Meikäläinen/)).toBeInTheDocument()
+    expect(screen.getByText(/likes 5/)).toBeInTheDocument()
+
+    expect(screen.queryByTestId('like-button')).toBeNull()
+    expect(screen.queryByTestId('delete-button')).toBeNull()
   })
 
-  test('shows url, likes and user name after clicking the view button', async () => {
-    render(<Blog blog={blog} user={user} onDelete={() => {}} />)
+  test('logged-in non-creator sees only like button', () => {
+    render(
+      <Blog
+        blogs={[blog]}
+        user={otherUser}
+        onDelete={() => { }}
+        onLike={() => { }}
+      />
+    )
 
-    const userSim = userEvent.setup()
-    const button = screen.getByText('view')
-    await userSim.click(button)
-
-    expect(screen.getByText('http://example.com/testi')).toBeDefined()
-    expect(screen.getByText('likes 5')).toBeDefined()
-    expect(screen.getByText('Emmiina Testaaja')).toBeDefined()
+    expect(screen.getByText(/likes 5/)).toBeInTheDocument()
+    expect(screen.getByTestId('like-button')).toBeInTheDocument()
+    expect(screen.queryByTestId('delete-button')).toBeNull()
   })
 
-  test('calls like handler twice when like button is clicked twice', async () => {
+  test('creator sees both like and delete buttons', () => {
+    render(
+      <Blog
+        blogs={[blog]}
+        user={user}
+        onDelete={() => { }}
+        onLike={() => { }}
+      />
+    )
+
+    expect(screen.getByTestId('like-button')).toBeInTheDocument()
+    expect(screen.getByTestId('delete-button')).toBeInTheDocument()
+  })
+
+  test('like handler is called when like button is clicked', async () => {
     const mockLikeHandler = vi.fn()
-    blogService.update = vi.fn().mockResolvedValue({ likes: 6 })
+    const userSim = userEvent.setup()
 
     render(
       <Blog
-        blog={blog}
+        blogs={[blog]}
         user={user}
-        onDelete={() => {}}
+        onDelete={() => { }}
         onLike={mockLikeHandler}
       />
     )
 
-    const userSim = userEvent.setup()
-
-    const viewButton = screen.getByText('view')
-    await userSim.click(viewButton)
-
-    const likeButton = screen.getByText('like')
+    const likeButton = screen.getByTestId('like-button')
     await userSim.click(likeButton)
     await userSim.click(likeButton)
 
     expect(mockLikeHandler).toHaveBeenCalledTimes(2)
   })
-
 })
+
