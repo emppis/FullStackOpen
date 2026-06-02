@@ -1,26 +1,12 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useParams } from 'react-router-dom'
+import { Card, CardContent, Typography, Button, Box, Link as MuiLink } from '@mui/material'
 
 const Blog = ({ blogs, user, onDelete, onLike }) => {
   const id = useParams().id
-  const [visible, setVisible] = useState(false)
   const blog = blogs.find(n => n.id === id)
-
   if (!blog) return null
-
-  console.log('Blog.jsx render, user:', user)
-  console.log('Blog.jsx render, blog.user:', blog.user)
-
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    marginBottom: 5
-  }
-
-  const toggleVisibility = () => {
-    setVisible(!visible)
-  }
 
   const handleDelete = async () => {
     const confirm = window.confirm(`Remove blog "${blog.title}" by ${blog.author}?`)
@@ -44,22 +30,49 @@ const Blog = ({ blogs, user, onDelete, onLike }) => {
     (blog.user.username === user.username || blog.user === user.id)
 
   return (
-    <div style={blogStyle} className="blog">
-      <div>
-        <h3><span data-testid="blog-title">{blog.author}: {blog.title}</span></h3>
-        <div data-testid="blog-url"><a href={blog.url}>{blog.url}</a></div>
-        <div>
-          <span data-testid="blog-likes">likes {blog.likes}</span>
+    <Card sx={{ mt: 2, p: 2 }}>
+      <CardContent>
+        <Typography variant="h5" gutterBottom>
+          {blog.title}
+        </Typography>
+        <Typography variant="subtitle1" color="text.secondary">
+          by {blog.author}
+        </Typography>
+
+        <MuiLink href={blog.url} target="_blank" rel="noopener" underline="hover">
+          {blog.url}
+        </MuiLink>
+
+
+        <Typography variant="body2" sx={{ mt: 1 }}>
+          Added by {blog.user?.name}
+        </Typography>
+
+        <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Typography variant="body1">{blog.likes} likes</Typography>
           {user && (
-            <button onClick={handleLike} data-testid="like-button">like</button>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={handleLike}
+              data-testid="like-button"
+            >
+              LIKE
+            </Button>
           )}
-        </div>
-        <div data-testid="blog-user">Added by {blog.user?.name}</div>
-        {showDelete && (
-          <button onClick={handleDelete} data-testid="delete-button">remove</button>
-        )}
-      </div>
-    </div>
+          {showDelete && (
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={handleDelete}
+              data-testid="delete-button"
+            >
+              REMOVE
+            </Button>
+          )}
+        </Box>
+      </CardContent>
+    </Card>
   )
 }
 

@@ -10,6 +10,7 @@ import BlogList from './components/BlogList'
 import {
   Routes, Route, Link, useNavigate
 } from 'react-router-dom'
+import { Container, Button, Toolbar, AppBar, Box, Typography } from '@mui/material'
 
 const App = () => {
 
@@ -97,16 +98,36 @@ const App = () => {
     setBlogs(blogs.map(b => b.id !== id ? b : returnedBlog))
   }
 
+  const style = { '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' } }
 
   return (
 
-    <div>
-      <nav>
-        <Link to="/">blogs</Link>{' '}
-        {user && <Link to="/create">new blog</Link>}{' '}
-        {!user && <Link to="/login">login</Link>}{' '}
-        {user && <button onClick={handleLogout}>logout</button>}
-      </nav>
+    <Container>
+      <AppBar position="static">
+        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Typography variant="h6" component="div">
+            Blog App
+          </Typography>
+          <Box>
+            <Button color="inherit" component={Link} to="/" sx={style}>blogs</Button>
+            {user && (
+              <Button color="inherit" component={Link} to="/create" sx={style}>
+                new blog
+              </Button>
+            )}
+            {!user && (
+              <Button color="inherit" component={Link} to="/login" sx={style}>
+                login
+              </Button>
+            )}
+            {user && (
+              <Button color="inherit" onClick={handleLogout} sx={style}>
+                logout
+              </Button>
+            )}
+          </Box>
+        </Toolbar>
+      </AppBar>
 
       <Notification message={notification} />
 
@@ -155,7 +176,7 @@ const App = () => {
           }
         />
       </Routes>
-    </div>
+    </Container>
 
   )
 }
